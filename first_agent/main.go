@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"github.com/binarys-stars/my-deep-research.git/logs"
+	"github.com/binarys-stars/my-deep-research/logs"
 	"github.com/cloudwego/eino-examples/flow/agent/deer-go/biz/infra"
 	"github.com/cloudwego/eino/components/model"
 	"github.com/cloudwego/eino/components/tool"
@@ -11,7 +11,6 @@ import (
 	"github.com/cloudwego/eino/flow/agent/react"
 	"github.com/cloudwego/eino/schema"
 	"log"
-
 )
 
 func main() {
