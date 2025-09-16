@@ -33,7 +33,7 @@ func main() {
 	}
 
 	log.Printf("===bind tools to chat model===\n")
-	chatModel, err = chatModel.WithTools(toolInfos)
+	chatModel, err := chatModel.WithTools(toolInfos)
 	if err != nil {
 		logs.Errorf("bind tools to chat model failed, err=%v", err)
 		return

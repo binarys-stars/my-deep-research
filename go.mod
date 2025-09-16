@@ -5,7 +5,9 @@ go 1.24.4
 require (
 	github.com/cloudwego/eino v0.5.3
 	github.com/cloudwego/eino-examples/flow/agent/deer-go v0.0.0-20250911112841-3a94b9ab0db1
+	github.com/cloudwego/eino-ext/components/model/openai v0.0.0-20250826125654-37d4a5029810
 	github.com/cloudwego/eino-ext/components/tool/duckduckgo/v2 v2.0.0-20250826125654-37d4a5029810
+	github.com/joho/godotenv v1.5.1
 )
 
 require (
@@ -22,7 +24,6 @@ require (
 	github.com/cloudwego/base64x v0.1.5 // indirect
 	github.com/cloudwego/eino-ext/callbacks/apmplus v0.0.1 // indirect
 	github.com/cloudwego/eino-ext/callbacks/cozeloop v0.1.4 // indirect
-	github.com/cloudwego/eino-ext/components/model/openai v0.0.0-20250826125654-37d4a5029810 // indirect
 	github.com/cloudwego/eino-ext/libs/acl/openai v0.0.0-20250826113018-8c6f6358d4bb // indirect
 	github.com/cloudwego/eino-ext/libs/acl/opentelemetry v0.0.0-20250225080340-5935633151d3 // indirect
 	github.com/cloudwego/gopkg v0.1.5 // indirect
@@ -48,7 +49,6 @@ require (
 	github.com/hertz-contrib/obs-opentelemetry/provider v0.3.0 // indirect
 	github.com/hertz-contrib/obs-opentelemetry/tracing v0.4.1 // indirect
 	github.com/invopop/yaml v0.3.1 // indirect
-	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect

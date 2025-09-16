@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"github.com/binarys-stars/my-deep-research.git/logs"
+	"github.com/binarys-stars/my-deep-research/logs"
 	"github.com/cloudwego/eino-ext/components/tool/duckduckgo/v2"
 	"github.com/cloudwego/eino/components/tool"
 	"github.com/cloudwego/eino/components/tool/utils"

@@ -2,10 +2,9 @@ package main
 
 import (
 	"context"
-	"log"
-
 	"github.com/cloudwego/eino/components/prompt"
 	"github.com/cloudwego/eino/schema"
+	"log"
 )
 
 func createTemplate() prompt.ChatTemplate {
