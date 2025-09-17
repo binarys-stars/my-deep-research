@@ -2,74 +2,24 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"github.com/binarys-stars/my-deep-research/biz/infra"
 	"github.com/binarys-stars/my-deep-research/logs"
-	"github.com/cloudwego/eino-examples/flow/agent/deer-go/biz/infra"
 	"github.com/cloudwego/eino/components/model"
 	"github.com/cloudwego/eino/components/tool"
 	"github.com/cloudwego/eino/compose"
 	"github.com/cloudwego/eino/flow/agent"
 	"github.com/cloudwego/eino/flow/agent/react"
 	"github.com/cloudwego/eino/schema"
+	//"github.com/cloudwego/eino-ext/components/tool/duckduckgo"
+	//"github.com/cloudwego/eino/components/tool"
 	"log"
 )
 
-func main() {
-	ctx := context.Background()
-	// 创建llm
-	log.Printf("===create llm===\n")
-	chatModel := createOpenAIChatModel(ctx)
-
-	// 创建工具
-	log.Printf("===get tools===\n")
-	tools := getTools()
-
-	// 构造工具信息
-	log.Printf("===build tool infos===\n")
-	toolInfos := buildToolsInfo(ctx, tools)
-	// 工具信息绑定到 ChatModel
-	if toolInfos == nil {
-		logs.Errorf("build tool infos failed")
-		return
-	}
-
-	log.Printf("===bind tools to chat model===\n")
-	chatModel, err := chatModel.WithTools(toolInfos)
-	if err != nil {
-		logs.Errorf("bind tools to chat model failed, err=%v", err)
-		return
-	}
-
-	// 创建工具节点
-	log.Printf("===build tools node===\n")
-	toolsNode := buildToolsNode(ctx, tools)
-	if toolsNode == nil {
-		logs.Errorf("build tools node failed")
-		return
-	}
-
-	// 创建输入信息
-	log.Printf("===create input messages===\n")
-	messages := []*schema.Message{
-		{
-			Role:    schema.User,
-			Content: "帮我在bilibili上打开一个关于缓解焦虑的雨声的视频",
-		},
-	}
-
-	err = runAgentByReAct(ctx, chatModel, compose.ToolsNodeConfig{
-		Tools: tools,
-	}, messages)
-	if err != nil {
-		logs.Errorf("run agent by react failed, err=%v", err)
-		return
-	}
-
-}
-
 func getTools() []tool.BaseTool {
 	tools := []tool.BaseTool{
-		GetDuckDuckGoTool(),
-		GetBrowserTool(),
+		infra.GetDuckDuckGoTool(),
+		infra.GetBrowserTool(),
 	}
 
 	return tools
@@ -148,4 +98,73 @@ func runAgentByReAct(ctx context.Context, chatModel model.ToolCallingChatModel, 
 	logs.Infof("message index: %d, role: %s, content: %s", 0, rmsg.Role, rmsg.Content)
 
 	return nil
+}
+func main() {
+	ctx := context.Background()
+	// 创建llm
+	log.Printf("===create llm===\n")
+	chatModel := infra.CreateOpenAIChatModel(ctx)
+
+	// 创建工具
+	log.Printf("===get tools===\n")
+	tools := getTools()
+
+	// 构造工具信息
+	log.Printf("===build tool infos===\n")
+	toolInfos := buildToolsInfo(ctx, tools)
+	// 工具信息绑定到 ChatModel
+	if toolInfos == nil {
+		logs.Errorf("build tool infos failed")
+		return
+	}
+
+	log.Printf("===bind tools to chat model===\n")
+	chatModel, err := chatModel.WithTools(toolInfos)
+	if err != nil {
+		logs.Errorf("bind tools to chat model failed, err=%v", err)
+		return
+	}
+
+	// 创建工具节点
+	log.Printf("===build tools node===\n")
+	toolsNode := buildToolsNode(ctx, tools)
+	if toolsNode == nil {
+		logs.Errorf("build tools node failed")
+		return
+	}
+
+	// 创建输入信息
+	log.Printf("===create input messages===\n")
+	messages := []*schema.Message{
+		{
+			Role:    schema.User,
+			Content: "帮我在bilibili上打开一个关于可爱的猫咪的视频",
+		},
+	}
+	lambda := compose.InvokableLambda(func(ctx context.Context, input []*schema.Message) (output []*schema.Message, err error) {
+		desuwa := input[0].Content + " 回答结尾加上desuwa"
+		output = []*schema.Message{
+			{
+				Role:    schema.User,
+				Content: desuwa,
+			},
+		}
+		return output, nil
+	})
+	chain := compose.NewChain[[]*schema.Message, []*schema.Message]()
+	chain.AppendLambda(lambda).AppendChatModel(chatModel, compose.WithNodeName("chat_model_2")).AppendToolsNode(toolsNode)
+	agent, err := chain.Compile(ctx)
+	if err != nil {
+		logs.Errorf("compile chain failed, err=%v", err)
+		return
+	}
+	// 执行Agent
+	output, err := agent.Invoke(ctx, messages, compose.WithCallbacks(&infra.LoggerCallback{}))
+	if err != nil {
+		logs.Errorf("invoke agent failed, err=%v", err)
+		return
+	}
+	fmt.Println(output[0].Content)
+	return
+
 }

@@ -1,4 +1,4 @@
-package main
+package infra
 
 import (
 	"context"
@@ -11,21 +11,17 @@ import (
 	"runtime"
 )
 
-const (
-	ENV_Name = "first_agent\\.env"
-)
-
-func createOpenAIChatModel(ctx context.Context) model.ToolCallingChatModel {
+func CreateOpenAIChatModel(ctx context.Context) model.ToolCallingChatModel {
 	switch runtime.GOOS {
 	case "windows":
-		err := godotenv.Load(ENV_Name)
+		err := godotenv.Load("biz/infra/.env")
 		if err != nil {
-			log.Printf("Error loading .env file, err=%v", err)
+			logs.Errorf("Error loading .env file, err=%v", err)
 		}
 	case "darwin":
-		err := godotenv.Load("quickstart/funAgent/.env")
+		err := godotenv.Load("biz/infra/.env")
 		if err != nil {
-			log.Printf("Error loading .env file, err=%v", err)
+			logs.Errorf("Error loading .env file, err=%v", err)
 		}
 	default:
 		logs.Infof("unsupported platform")

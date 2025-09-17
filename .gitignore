@@ -26,6 +26,7 @@ go.work.sum
 
 # env file
 first_agent/.env
+biz/infra/.env
 
 # Editor/IDE
 # .idea/
