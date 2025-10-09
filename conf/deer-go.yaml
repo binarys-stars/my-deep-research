@@ -4,22 +4,15 @@ mcp:
       command: "npx"
       args: ["-y", "tavily-mcp@0.1.3"]
       env: { "TAVILY_API_KEY": "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" }
-    firecrawl:
-      command: "npx"
-      args: [ "-y", "firecrawl-mcp" ]
-      env: { "FIRECRAWL_API_KEY": "fc-5be7015317244a07930be4ce4f1842c6" }
-    python:
-      command: "uv"
-      args: [ "--directory",
-              "flow/agent/deer-go/biz/mcps/python",
-              "run",
-              "server.py",
-      ]
+   # firecrawl:
+    #  command: "npx"
+     # args: [ "-y", "firecrawl-mcp" ]
+     # env: { "FIRECRAWL_API_KEY": "fc-5be7015317244a07930be4ce4f1842c6" }
 model:
-  default_model: "doubao-seed-1-6-250615"
-  api_key: "3c221580-e12c-4fdf-90ef-bb65b1f0a85d"
+  default_model: "doubao-seed-1-6-flash-250828"
+  api_key: "a2d1684e-0696-4c94-8e5b-11a3a7af9815"
   base_url: "https://ark.cn-beijing.volces.com/api/v3"
 
 setting:
-  max_plan_iterations: 1
-  max_step_num: 3
+  max_plan_iterations: 2
+  max_step_num: 2

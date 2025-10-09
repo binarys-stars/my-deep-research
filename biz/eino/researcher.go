@@ -19,6 +19,9 @@ package eino
 import (
 	"context"
 	"fmt"
+	"github.com/binarys-stars/my-deep-research/biz/consts"
+	"github.com/binarys-stars/my-deep-research/biz/infra"
+	"github.com/binarys-stars/my-deep-research/biz/model"
 	"io"
 	"strings"
 	"time"
@@ -30,10 +33,6 @@ import (
 	"github.com/cloudwego/eino/compose"
 	"github.com/cloudwego/eino/flow/agent/react"
 	"github.com/cloudwego/eino/schema"
-
-	"github.com/cloudwego/eino-examples/flow/agent/deer-go/biz/consts"
-	"github.com/cloudwego/eino-examples/flow/agent/deer-go/biz/infra"
-	"github.com/cloudwego/eino-examples/flow/agent/deer-go/biz/model"
 )
 
 func loadResearcherMsg(ctx context.Context, name string, opts ...any) (output []*schema.Message, err error) {
@@ -51,7 +50,7 @@ func loadResearcherMsg(ctx context.Context, name string, opts ...any) (output []
 
 		var curStep *model.Step
 		for i := range state.CurrentPlan.Steps {
-			if state.CurrentPlan.Steps[i].ExecutionRes == nil {
+			if state.CurrentPlan.Steps[i].ExecutionRes == nil || *state.CurrentPlan.Steps[i].ExecutionRes == "" {
 				curStep = &state.CurrentPlan.Steps[i]
 				break
 			}
@@ -87,7 +86,7 @@ func routerResearcher(ctx context.Context, input *schema.Message, opts ...any) (
 			output = state.Goto
 		}()
 		for i, step := range state.CurrentPlan.Steps {
-			if step.ExecutionRes == nil {
+			if step.ExecutionRes == nil || *step.ExecutionRes == "" {
 				str := strings.Clone(last.Content)
 				state.CurrentPlan.Steps[i].ExecutionRes = &str
 				break

@@ -19,16 +19,15 @@ package eino
 import (
 	"context"
 	"encoding/json"
+	"github.com/binarys-stars/my-deep-research/biz/consts"
+	"github.com/binarys-stars/my-deep-research/biz/infra"
+	"github.com/binarys-stars/my-deep-research/biz/model"
 	"time"
 
 	"github.com/RanFeng/ilog"
 	"github.com/cloudwego/eino/components/prompt"
 	"github.com/cloudwego/eino/compose"
 	"github.com/cloudwego/eino/schema"
-
-	"github.com/cloudwego/eino-examples/flow/agent/deer-go/biz/consts"
-	"github.com/cloudwego/eino-examples/flow/agent/deer-go/biz/infra"
-	"github.com/cloudwego/eino-examples/flow/agent/deer-go/biz/model"
 )
 
 func loadMsg(ctx context.Context, name string, opts ...any) (output []*schema.Message, err error) {
@@ -98,10 +97,10 @@ func NewCAgent[I, O any](ctx context.Context) *compose.Graph[I, O] {
 		}),
 	}
 
-	coorModel, _ := infra.ChatModel.WithTools([]*schema.ToolInfo{hand_to_planner})
+	toolModel, _ := infra.ChatModel.WithTools([]*schema.ToolInfo{hand_to_planner})
 
 	_ = cag.AddLambdaNode("load", compose.InvokableLambdaWithOption(loadMsg))
-	_ = cag.AddChatModelNode("agent", coorModel)
+	_ = cag.AddChatModelNode("agent", toolModel)
 	_ = cag.AddLambdaNode("router", compose.InvokableLambdaWithOption(router))
 
 	_ = cag.AddEdge(compose.START, "load")

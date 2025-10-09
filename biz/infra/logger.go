@@ -15,8 +15,8 @@ import (
 	"github.com/cloudwego/eino/schema"
 	"github.com/cloudwego/hertz/pkg/protocol/sse"
 
-	"github.com/cloudwego/eino-examples/flow/agent/deer-go/biz/model"
-	"github.com/cloudwego/eino-examples/flow/agent/deer-go/biz/util"
+	"github.com/binarys-stars/my-deep-research/biz/model"
+	"github.com/binarys-stars/my-deep-research/biz/util"
 )
 
 type LoggerCallback struct {

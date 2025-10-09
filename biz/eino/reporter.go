@@ -19,15 +19,16 @@ package eino
 import (
 	"context"
 	"fmt"
+	"github.com/binarys-stars/my-deep-research/biz/infra"
+	"github.com/binarys-stars/my-deep-research/biz/model"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/RanFeng/ilog"
 	"github.com/cloudwego/eino/components/prompt"
 	"github.com/cloudwego/eino/compose"
 	"github.com/cloudwego/eino/schema"
-
-	"github.com/cloudwego/eino-examples/flow/agent/deer-go/biz/infra"
-	"github.com/cloudwego/eino-examples/flow/agent/deer-go/biz/model"
 )
 
 func loadReporterMsg(ctx context.Context, name string, opts ...any) (output []*schema.Message, err error) {
@@ -49,7 +50,9 @@ func loadReporterMsg(ctx context.Context, name string, opts ...any) (output []*s
 			schema.SystemMessage("IMPORTANT: Structure your report according to the format in the prompt. Remember to include:\n\n1. Key Points - A bulleted list of the most important findings\n2. Overview - A brief introduction to the topic\n3. Detailed Analysis - Organized into logical sections\n4. Survey Note (optional) - For more comprehensive reports\n5. Key Citations - List all references at the end\n\nFor citations, DO NOT include inline citations in the text. Instead, place all citations in the 'Key Citations' section at the end using the format: `- [Source Title](URL)`. Include an empty line between each citation for better readability.\n\nPRIORITIZE USING MARKDOWN TABLES for data presentation and comparison. Use tables whenever presenting comparative data, statistics, features, or options. Structure tables with clear headers and aligned columns. Example table format:\n\n| Feature | Description | Pros | Cons |\n|---------|-------------|------|------|\n| Feature 1 | Description 1 | Pros 1 | Cons 1 |\n| Feature 2 | Description 2 | Pros 2 | Cons 2 |"),
 		)
 		for _, step := range state.CurrentPlan.Steps {
-			msg = append(msg, schema.UserMessage(fmt.Sprintf("Below are some observations for the research task:\n\n %v", *step.ExecutionRes)))
+			if step.ExecutionRes != nil && *step.ExecutionRes != "" {
+				msg = append(msg, schema.UserMessage(fmt.Sprintf("Below are some observations for the research task:\n\n %v", *step.ExecutionRes)))
+			}
 		}
 		variables := map[string]any{
 			"locale":              state.Locale,
@@ -71,6 +74,35 @@ func routerReporter(ctx context.Context, input *schema.Message, opts ...any) (ou
 		}()
 		ilog.EventInfo(ctx, "report_end", "report", input.Content)
 		state.Goto = compose.END
+		// 将 input.content 内容写入到.md文件,路径在create下
+		// 生成带路径的文件名,文件保存到create目录
+		fileName := time.Now().Format("20060102150405") + "_report.md"
+		filePath := filepath.Join("create", fileName) // 使用filepath.Join处理路径分隔符
+
+		// 确保create目录存在
+		if err := os.MkdirAll("create", 0755); err != nil {
+			ilog.EventError(ctx, err, "create directory failed", "dir", "create")
+			return nil // 目录创建失败继续执行，不影响主流程
+		}
+
+		// 创建文件
+		f, err := os.Create(filePath)
+		if err != nil {
+			ilog.EventError(ctx, err, "create report file failed", "file", filePath)
+			return nil // 文件创建失败继续执行，不影响主流程
+		}
+		defer func() {
+			// 确保文件关闭
+			if err := f.Close(); err != nil {
+				ilog.EventError(ctx, err, "close report file failed", "file", filePath)
+			}
+		}()
+
+		// 写入内容
+		if _, err = f.WriteString(input.Content); err != nil {
+			ilog.EventError(ctx, err, "write report content failed", "file", filePath)
+			return nil // 写入失败继续执行，不影响主流程
+		}
 		return nil
 	})
 	return output, nil

@@ -18,12 +18,11 @@ package eino
 
 import (
 	"context"
+	"github.com/binarys-stars/my-deep-research/biz/consts"
+	"github.com/binarys-stars/my-deep-research/biz/model"
 
 	"github.com/RanFeng/ilog"
 	"github.com/cloudwego/eino/compose"
-
-	"github.com/cloudwego/eino-examples/flow/agent/deer-go/biz/consts"
-	"github.com/cloudwego/eino-examples/flow/agent/deer-go/biz/model"
 )
 
 func routerResearchTeam(ctx context.Context, input string, opts ...any) (output string, err error) {
@@ -37,16 +36,13 @@ func routerResearchTeam(ctx context.Context, input string, opts ...any) (output 
 			return nil
 		}
 		for i, step := range state.CurrentPlan.Steps {
-			if step.ExecutionRes != nil {
+			if step.ExecutionRes != nil && *step.ExecutionRes != "" {
 				continue
 			}
 			ilog.EventInfo(ctx, "research_team_step", "step", step, "index", i)
 			switch step.StepType {
 			case model.Research:
 				state.Goto = consts.Researcher
-				return nil
-			case model.Processing:
-				state.Goto = consts.Coder
 				return nil
 			}
 		}

@@ -19,16 +19,15 @@ package eino
 import (
 	"context"
 	"encoding/json"
+	"github.com/binarys-stars/my-deep-research/biz/consts"
+	"github.com/binarys-stars/my-deep-research/biz/infra"
+	"github.com/binarys-stars/my-deep-research/biz/model"
 	"strings"
 
 	"github.com/RanFeng/ilog"
 	"github.com/cloudwego/eino-ext/components/tool/mcp"
 	"github.com/cloudwego/eino/components/tool"
 	"github.com/cloudwego/eino/compose"
-
-	"github.com/cloudwego/eino-examples/flow/agent/deer-go/biz/consts"
-	"github.com/cloudwego/eino-examples/flow/agent/deer-go/biz/infra"
-	"github.com/cloudwego/eino-examples/flow/agent/deer-go/biz/model"
 )
 
 func search(ctx context.Context, name string, opts ...any) (output string, err error) {

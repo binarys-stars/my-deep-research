@@ -2,8 +2,8 @@ package infra
 
 import (
 	"context"
+	"github.com/binarys-stars/my-deep-research/biz/model"
 	"github.com/binarys-stars/my-deep-research/conf"
-	"github.com/cloudwego/eino-examples/flow/agent/deer-go/biz/model"
 	"github.com/cloudwego/eino-ext/components/model/openai"
 	openai3 "github.com/cloudwego/eino-ext/libs/acl/openai"
 	"github.com/getkin/kin-openapi/openapi3gen"

@@ -20,16 +20,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/binarys-stars/my-deep-research/biz/consts"
+	"github.com/binarys-stars/my-deep-research/biz/infra"
+	"github.com/binarys-stars/my-deep-research/biz/model"
 	"time"
 
 	"github.com/RanFeng/ilog"
 	"github.com/cloudwego/eino/components/prompt"
 	"github.com/cloudwego/eino/compose"
 	"github.com/cloudwego/eino/schema"
-
-	"github.com/cloudwego/eino-examples/flow/agent/deer-go/biz/consts"
-	"github.com/cloudwego/eino-examples/flow/agent/deer-go/biz/infra"
-	"github.com/cloudwego/eino-examples/flow/agent/deer-go/biz/model"
 )
 
 func loadPlannerMsg(ctx context.Context, name string, opts ...any) (output []*schema.Message, err error) {
@@ -72,7 +71,6 @@ func routerPlanner(ctx context.Context, input *schema.Message, opts ...any) (out
 		defer func() {
 			output = state.Goto
 		}()
-		state.Goto = compose.END
 		state.CurrentPlan = &model.Plan{}
 		// TODO fix 一些 ```
 		err = json.Unmarshal([]byte(input.Content), state.CurrentPlan)
@@ -90,13 +88,12 @@ func routerPlanner(ctx context.Context, input *schema.Message, opts ...any) (out
 			state.Goto = consts.Reporter
 			return nil
 		}
-
-		state.Goto = consts.Human // TODO 改成 human_feedback
+		state.Goto = consts.ResearchTeam
+		// state.Goto = consts.Human // TODO 改成 human_feedback
 		return nil
 	})
 	return output, nil
 }
-
 func NewPlanner[I, O any](ctx context.Context) *compose.Graph[I, O] {
 	cag := compose.NewGraph[I, O]()
 

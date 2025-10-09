@@ -2,12 +2,10 @@ package eino
 
 import (
 	"context"
-
 	"github.com/RanFeng/ilog"
+	"github.com/binarys-stars/my-deep-research/biz/consts"
+	"github.com/binarys-stars/my-deep-research/biz/model"
 	"github.com/cloudwego/eino/compose"
-
-	"github.com/cloudwego/eino-examples/flow/agent/deer-go/biz/consts"
-	"github.com/cloudwego/eino-examples/flow/agent/deer-go/biz/model"
 )
 
 //type I = string
@@ -28,20 +26,6 @@ func agentHandOff(ctx context.Context, input string) (next string, err error) {
 
 // Builder 初始化全部子图并连接
 func Builder[I, O, S any](ctx context.Context, genFunc compose.GenLocalState[S]) compose.Runnable[I, O] {
-	//tools := map[string]Tool{}
-	//for _, cli := range llms.MCPServer {
-	//	ts, err := mcp.GetTools(ctx, &mcp.Config{Cli: cli})
-	//	if err != nil {
-	//		ilog.EventError(ctx, err, "builder_error")
-	//	}
-	//	for _, t := range ts {
-	//		v := Tool{}
-	//		v.Schema, err = t.Info(ctx)
-	//		v.CallAble = t.(tool.InvokableTool)
-	//		tools[v.Schema.Name] = v
-	//	}
-	//}
-	//ilog.EventInfo(ctx, "builder", "tools", tools)
 
 	g := compose.NewGraph[I, O](
 		compose.WithGenLocalState(genFunc),
@@ -53,7 +37,6 @@ func Builder[I, O, S any](ctx context.Context, genFunc compose.GenLocalState[S])
 		consts.Reporter:               true,
 		consts.ResearchTeam:           true,
 		consts.Researcher:             true,
-		consts.Coder:                  true,
 		consts.BackgroundInvestigator: true,
 		consts.Human:                  true,
 		compose.END:                   true,
@@ -65,7 +48,6 @@ func Builder[I, O, S any](ctx context.Context, genFunc compose.GenLocalState[S])
 	researchTeamGraph := NewResearchTeamNode[I, O](ctx)
 	researcherGraph := NewResearcher[I, O](ctx)
 	bIGraph := NewBAgent[I, O](ctx)
-	coder := NewCoder[I, O](ctx)
 	human := NewHumanNode[I, O](ctx)
 
 	_ = g.AddGraphNode(consts.Coordinator, coordinatorGraph, compose.WithNodeName(consts.Coordinator))
@@ -73,7 +55,6 @@ func Builder[I, O, S any](ctx context.Context, genFunc compose.GenLocalState[S])
 	_ = g.AddGraphNode(consts.Reporter, reporterGraph, compose.WithNodeName(consts.Reporter))
 	_ = g.AddGraphNode(consts.ResearchTeam, researchTeamGraph, compose.WithNodeName(consts.ResearchTeam))
 	_ = g.AddGraphNode(consts.Researcher, researcherGraph, compose.WithNodeName(consts.Researcher))
-	_ = g.AddGraphNode(consts.Coder, coder, compose.WithNodeName(consts.Coder))
 	_ = g.AddGraphNode(consts.BackgroundInvestigator, bIGraph, compose.WithNodeName(consts.BackgroundInvestigator))
 	_ = g.AddGraphNode(consts.Human, human, compose.WithNodeName(consts.Human))
 
@@ -82,7 +63,6 @@ func Builder[I, O, S any](ctx context.Context, genFunc compose.GenLocalState[S])
 	_ = g.AddBranch(consts.Reporter, compose.NewGraphBranch(agentHandOff, outMap))
 	_ = g.AddBranch(consts.ResearchTeam, compose.NewGraphBranch(agentHandOff, outMap))
 	_ = g.AddBranch(consts.Researcher, compose.NewGraphBranch(agentHandOff, outMap))
-	_ = g.AddBranch(consts.Coder, compose.NewGraphBranch(agentHandOff, outMap))
 	_ = g.AddBranch(consts.BackgroundInvestigator, compose.NewGraphBranch(agentHandOff, outMap))
 	_ = g.AddBranch(consts.Human, compose.NewGraphBranch(agentHandOff, outMap))
 
@@ -91,6 +71,7 @@ func Builder[I, O, S any](ctx context.Context, genFunc compose.GenLocalState[S])
 	r, err := g.Compile(ctx,
 		compose.WithGraphName("EinoDeer"),
 		compose.WithNodeTriggerMode(compose.AnyPredecessor),
+		//	compose.WithInterruptAfterNodes([]string{consts.Planner}),
 		compose.WithCheckPointStore(model.NewDeerCheckPoint(ctx)), // 指定Graph CheckPointStore
 	)
 	if err != nil {
